@@ -26,6 +26,8 @@ Share a URL with a league slug (letters, numbers, hyphens):
 
 Everyone on that URL shares draft status and pick order. Tribe assignments are shared for the whole season (all URLs).
 
+While someone has the page open in a **visible** browser tab, the app **polls Redis every second** for league draft and tribe data. Polling **stops** when the tab is hidden or closed—there is no server-side polling when nobody is viewing the site.
+
 ## 4. Privacy (crawlers)
 
 `robots.txt`, page metadata, and `X-Robots-Tag` ask crawlers not to index the site. That reduces casual search indexing; it is **not** access control—anyone with the URL can read or edit data.

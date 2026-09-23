@@ -22,7 +22,8 @@ import {
 } from "@/app/lib/tribe-assignment";
 
 const DRAFT_SAVE_MS = 500;
-const LEAGUE_POLL_MS = 20_000;
+/** Refresh interval while this tab is visible (no background / no-server polling) */
+const REMOTE_POLL_MS = 1_000;
 
 async function fetchTribeAssignments(): Promise<
   Partial<Record<string, TribeId>>
@@ -73,6 +74,46 @@ function applyLeagueDraft(draft: LeagueDraftPayload) {
     myTeamOrder: reconcileMyTeamOrder(statusByName, draft.myTeamOrder ?? []),
     takenOrder: reconcileTakenOrder(statusByName, draft.takenOrder ?? []),
   };
+}
+
+/** Poll only while the document is visible; stops when tab is hidden or unmounted. */
+function usePollWhileTabVisible(pull: () => void | Promise<void>, enabled: boolean) {
+  useEffect(() => {
+    if (!enabled) return;
+
+    let intervalId: number | undefined;
+
+    const tick = () => {
+      if (document.visibilityState !== "visible") return;
+      void pull();
+    };
+
+    const start = () => {
+      if (intervalId !== undefined) return;
+      tick();
+      intervalId = window.setInterval(tick, REMOTE_POLL_MS);
+    };
+
+    const stop = () => {
+      if (intervalId !== undefined) {
+        window.clearInterval(intervalId);
+        intervalId = undefined;
+      }
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") start();
+      else stop();
+    };
+
+    if (document.visibilityState === "visible") start();
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [pull, enabled]);
 }
 
 export function useSyncedCastState() {
@@ -207,46 +248,33 @@ export function useSyncedCastState() {
     return () => window.clearTimeout(timer);
   }, [tribeByName, ready]);
 
-  useEffect(() => {
-    if (!ready || !leagueSlug) return;
+  const pullLeagueDraft = useCallback(async () => {
+    if (!leagueSlug || draftDirtyRef.current) return;
+    try {
+      const draft = await fetchLeagueDraft(leagueSlug);
+      skipNextDraftSaveRef.current = true;
+      const applied = applyLeagueDraft(draft);
+      setStatusByName(applied.statusByName);
+      setMyTeamOrder(applied.myTeamOrder);
+      setTakenOrder(applied.takenOrder);
+    } catch {
+      /* ignore transient poll errors */
+    }
+  }, [leagueSlug]);
 
-    const poll = () => {
-      if (draftDirtyRef.current) return;
-      void fetchLeagueDraft(leagueSlug)
-        .then((draft) => {
-          skipNextDraftSaveRef.current = true;
-          const applied = applyLeagueDraft(draft);
-          setStatusByName(applied.statusByName);
-          setMyTeamOrder(applied.myTeamOrder);
-          setTakenOrder(applied.takenOrder);
-        })
-        .catch(() => {
-          /* ignore transient poll errors */
-        });
-    };
+  const pullTribeAssignments = useCallback(async () => {
+    if (tribeDirtyRef.current) return;
+    try {
+      const assignments = await fetchTribeAssignments();
+      skipNextTribeSaveRef.current = true;
+      setTribeByName(assignments);
+    } catch {
+      /* ignore transient poll errors */
+    }
+  }, []);
 
-    const id = window.setInterval(poll, LEAGUE_POLL_MS);
-    return () => window.clearInterval(id);
-  }, [ready, leagueSlug]);
-
-  useEffect(() => {
-    if (!ready) return;
-
-    const poll = () => {
-      if (tribeDirtyRef.current) return;
-      void fetchTribeAssignments()
-        .then((assignments) => {
-          skipNextTribeSaveRef.current = true;
-          setTribeByName(assignments);
-        })
-        .catch(() => {
-          /* ignore transient poll errors */
-        });
-    };
-
-    const id = window.setInterval(poll, LEAGUE_POLL_MS);
-    return () => window.clearInterval(id);
-  }, [ready]);
+  usePollWhileTabVisible(pullLeagueDraft, ready && Boolean(leagueSlug));
+  usePollWhileTabVisible(pullTribeAssignments, ready);
 
   const resetAll = useCallback(async () => {
     if (typeof window !== "undefined") {
