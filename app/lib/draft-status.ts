@@ -4,6 +4,7 @@ export type DraftStatusFilter = DraftStatus | "all";
 
 export const DRAFT_STATUS_STORAGE_KEY = "fantasy-survivor-s51-draft-status";
 export const MY_TEAM_ORDER_STORAGE_KEY = "fantasy-survivor-s51-my-team-order";
+export const TAKEN_ORDER_STORAGE_KEY = "fantasy-survivor-s51-taken-order";
 
 export function readDraftStatusMap(): Record<string, DraftStatus> {
   if (typeof window === "undefined") return {};
@@ -31,23 +32,51 @@ export function readMyTeamOrder(): string[] {
   }
 }
 
-/** Drop stale names, append any my-team picks missing from order (legacy data). */
+export function readTakenOrder(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(TAKEN_ORDER_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((item): item is string => typeof item === "string");
+  } catch {
+    return [];
+  }
+}
+
+/** Drop stale names, append picks missing from order (legacy data). */
+export function reconcilePickOrder(
+  statusByName: Record<string, DraftStatus>,
+  order: string[],
+  forStatus: Exclude<DraftStatus, "available">,
+): string[] {
+  const matching = new Set(
+    Object.entries(statusByName)
+      .filter(([, status]) => status === forStatus)
+      .map(([name]) => name),
+  );
+
+  const next = order.filter((name) => matching.has(name));
+  const inOrder = new Set(next);
+  for (const name of matching) {
+    if (!inOrder.has(name)) next.push(name);
+  }
+  return next;
+}
+
 export function reconcileMyTeamOrder(
   statusByName: Record<string, DraftStatus>,
   order: string[],
 ): string[] {
-  const onTeam = new Set(
-    Object.entries(statusByName)
-      .filter(([, status]) => status === "my-team")
-      .map(([name]) => name),
-  );
+  return reconcilePickOrder(statusByName, order, "my-team");
+}
 
-  const next = order.filter((name) => onTeam.has(name));
-  const inOrder = new Set(next);
-  for (const name of onTeam) {
-    if (!inOrder.has(name)) next.push(name);
-  }
-  return next;
+export function reconcileTakenOrder(
+  statusByName: Record<string, DraftStatus>,
+  order: string[],
+): string[] {
+  return reconcilePickOrder(statusByName, order, "taken");
 }
 
 export function defaultDraftStatus(): DraftStatus {
@@ -61,14 +90,17 @@ export function resolveDraftStatus(
   return map[playerName] ?? defaultDraftStatus();
 }
 
-export function sortCastByMyTeamPickOrder<T extends { name: string }>(
+export function sortCastByPickOrder<T extends { name: string }>(
   players: T[],
-  myTeamOrder: string[],
+  pickOrder: string[],
 ): T[] {
-  const pickIndex = new Map(myTeamOrder.map((name, index) => [name, index]));
+  const pickIndex = new Map(pickOrder.map((name, index) => [name, index]));
   return [...players].sort(
     (a, b) =>
       (pickIndex.get(a.name) ?? Number.MAX_SAFE_INTEGER) -
       (pickIndex.get(b.name) ?? Number.MAX_SAFE_INTEGER),
   );
 }
+
+/** @deprecated use sortCastByPickOrder */
+export const sortCastByMyTeamPickOrder = sortCastByPickOrder;

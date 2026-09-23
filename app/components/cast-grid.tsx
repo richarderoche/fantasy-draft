@@ -12,13 +12,17 @@ import {
   type DraftStatus,
   type DraftStatusFilter,
   resolveDraftStatus,
-  sortCastByMyTeamPickOrder,
+  sortCastByPickOrder,
 } from "@/app/lib/draft-status";
 import {
   resolvePlayerTribe,
   type TribeFilter,
   type TribeId,
 } from "@/app/lib/tribe-assignment";
+import {
+  draftPickColor,
+  DRAFT_PICK_BADGE_COLORS,
+} from "@/app/lib/draft-colors";
 import { getTribeById, TRIBES, type Tribe } from "@/app/lib/tribes";
 
 export type Player = {
@@ -90,6 +94,46 @@ function WordPills({ words }: { words: string }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+function CastNameHeading({
+  name,
+  age,
+  tribe,
+  titleId,
+  variant = "grid",
+}: {
+  name: string;
+  age: number;
+  tribe?: Tribe;
+  titleId?: string;
+  variant?: "grid" | "lightbox";
+}) {
+  const headingClass =
+    variant === "lightbox"
+      ? "text-lg font-semibold leading-tight"
+      : "font-semibold leading-tight";
+
+  if (!tribe) {
+    return (
+      <h2 id={titleId} className={`${headingClass} text-zinc-900`}>
+        {name}
+        <span className="ml-2 font-normal text-zinc-500">{age}</span>
+      </h2>
+    );
+  }
+
+  return (
+    <h2 id={titleId} className={headingClass}>
+      <span
+        className="inline-flex max-w-full flex-wrap items-baseline gap-x-2 rounded-full px-2.5 py-0.5 text-zinc-900 ring-1 ring-inset ring-zinc-900/10"
+        style={{ backgroundColor: tribe.color }}
+      >
+        <span className="min-w-0">{name}</span>
+        <span className="font-normal tabular-nums">{age}</span>
+      </span>
+    </h2>
   );
 }
 
@@ -342,6 +386,8 @@ function Lightbox({
     };
   }, [onClose]);
 
+  const tribe = playerTribeId ? getTribeById(playerTribeId) : undefined;
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
@@ -370,15 +416,13 @@ function Lightbox({
           <div className="shrink-0 border-b border-zinc-100 p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h2
-                  id="lightbox-title"
-                  className="text-lg font-semibold leading-tight text-zinc-900"
-                >
-                  {player.name}
-                  <span className="ml-2 font-normal text-zinc-500">
-                    {player.age}
-                  </span>
-                </h2>
+                <CastNameHeading
+                  titleId="lightbox-title"
+                  name={player.name}
+                  age={player.age}
+                  tribe={tribe}
+                  variant="lightbox"
+                />
                 <p className="mt-1 text-sm text-zinc-600">
                   {player.occupation}
                   <span className="text-zinc-400"> · </span>
@@ -427,6 +471,7 @@ export function CastGrid({ cast }: { cast: Player[] }) {
     statusByName,
     tribeByName,
     myTeamOrder,
+    takenOrder,
     setPlayerStatus,
     setPlayerTribe,
     resetAll,
@@ -481,7 +526,9 @@ export function CastGrid({ cast }: { cast: Player[] }) {
       (player) => matchesStatusFilter(player) && matchesTribeFilter(player),
     );
     if (statusFilter === "my-team") {
-      list = sortCastByMyTeamPickOrder(list, myTeamOrder);
+      list = sortCastByPickOrder(list, myTeamOrder);
+    } else if (statusFilter === "taken") {
+      list = sortCastByPickOrder(list, takenOrder);
     }
     return list;
   }, [
@@ -490,6 +537,7 @@ export function CastGrid({ cast }: { cast: Player[] }) {
     matchesStatusFilter,
     matchesTribeFilter,
     myTeamOrder,
+    takenOrder,
   ]);
 
   const close = useCallback(() => setSelected(null), []);
@@ -538,27 +586,29 @@ export function CastGrid({ cast }: { cast: Player[] }) {
         {filteredCast.map((player) => {
           const status = getPlayerStatus(player.name);
           const tribeId = getPlayerTribe(player.name);
-          const pickIndex =
+          const pickOrder =
             statusFilter === "my-team"
-              ? myTeamOrder.indexOf(player.name)
-              : -1;
+              ? myTeamOrder
+              : statusFilter === "taken"
+                ? takenOrder
+                : null;
+          const pickIndex = pickOrder ? pickOrder.indexOf(player.name) : -1;
           const pickNumber = pickIndex >= 0 ? pickIndex + 1 : null;
+          const pickBadgeStyle =
+            statusFilter === "my-team" || statusFilter === "taken"
+              ? { backgroundColor: DRAFT_PICK_BADGE_COLORS[statusFilter] }
+              : undefined;
           const assignedTribe = tribeId ? getTribeById(tribeId) : undefined;
+          const actionBarBg = draftPickColor(status);
           return (
             <article
               key={player.name}
-              style={
-                assignedTribe
-                  ? { backgroundColor: assignedTribe.color }
-                  : undefined
-              }
-              className={`relative overflow-hidden rounded-xl border border-zinc-200 shadow-sm transition-shadow hover:shadow-md ${
-                assignedTribe ? "" : "bg-white"
-              }`}
+              className="relative overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-shadow hover:shadow-md"
             >
               {pickNumber !== null ? (
                 <span
-                  className="pointer-events-none absolute left-0 top-0 z-10 flex h-8 min-w-8 items-center justify-center rounded-br-lg bg-emerald-600 px-1.5 text-sm font-semibold tabular-nums text-white shadow-sm"
+                  style={pickBadgeStyle}
+                  className="pointer-events-none absolute left-0 top-0 z-10 flex h-8 min-w-8 items-center justify-center rounded-br-lg px-1.5 text-sm font-semibold tabular-nums text-white shadow-sm"
                   aria-label={`Pick ${pickNumber}`}
                 >
                   {pickNumber}
@@ -578,12 +628,11 @@ export function CastGrid({ cast }: { cast: Player[] }) {
                     className="h-[4.5rem] w-[4.5rem] shrink-0 rounded-lg border border-zinc-200 bg-zinc-100 object-cover"
                   />
                   <div className="min-w-0 flex-1">
-                    <h2 className="font-semibold leading-tight text-zinc-900">
-                      {player.name}
-                      <span className="ml-2 font-normal text-zinc-500">
-                        {player.age}
-                      </span>
-                    </h2>
+                    <CastNameHeading
+                      name={player.name}
+                      age={player.age}
+                      tribe={assignedTribe}
+                    />
                     <p className="mt-1 text-sm text-zinc-600">
                       {player.occupation}
                       <span className="text-zinc-400"> · </span>
@@ -593,7 +642,12 @@ export function CastGrid({ cast }: { cast: Player[] }) {
                   </div>
                 </div>
               </button>
-              <div className="border-t border-zinc-900/10 px-4 py-3">
+              <div
+                className="border-t border-zinc-200 px-4 py-3"
+                style={
+                  actionBarBg ? { backgroundColor: actionBarBg } : undefined
+                }
+              >
                 {cardControlMode === "draft" ? (
                   <DraftStatusControls
                     value={status}

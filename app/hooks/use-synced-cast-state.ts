@@ -6,9 +6,12 @@ import {
   type DraftStatus,
   DRAFT_STATUS_STORAGE_KEY,
   MY_TEAM_ORDER_STORAGE_KEY,
+  TAKEN_ORDER_STORAGE_KEY,
   readDraftStatusMap,
   readMyTeamOrder,
+  readTakenOrder,
   reconcileMyTeamOrder,
+  reconcileTakenOrder,
 } from "@/app/lib/draft-status";
 import { normalizeLeagueSlug } from "@/app/lib/league-slug";
 import type { LeagueDraftPayload } from "@/app/lib/league-draft";
@@ -63,6 +66,15 @@ async function saveLeagueDraft(
   if (!res.ok) throw new Error("league save failed");
 }
 
+function applyLeagueDraft(draft: LeagueDraftPayload) {
+  const statusByName = draft.statusByName ?? {};
+  return {
+    statusByName,
+    myTeamOrder: reconcileMyTeamOrder(statusByName, draft.myTeamOrder ?? []),
+    takenOrder: reconcileTakenOrder(statusByName, draft.takenOrder ?? []),
+  };
+}
+
 export function useSyncedCastState() {
   const searchParams = useSearchParams();
   const leagueSlug = normalizeLeagueSlug(searchParams.get("league"));
@@ -74,6 +86,7 @@ export function useSyncedCastState() {
     Partial<Record<string, TribeId>>
   >({});
   const [myTeamOrder, setMyTeamOrder] = useState<string[]>([]);
+  const [takenOrder, setTakenOrder] = useState<string[]>([]);
   const [ready, setReady] = useState(false);
   const [syncError, setSyncError] = useState<string | null>(null);
 
@@ -106,13 +119,10 @@ export function useSyncedCastState() {
           const draft = await fetchLeagueDraft(leagueSlug);
           if (!cancelled) {
             skipNextDraftSaveRef.current = true;
-            setStatusByName(draft.statusByName ?? {});
-            setMyTeamOrder(
-              reconcileMyTeamOrder(
-                draft.statusByName ?? {},
-                draft.myTeamOrder ?? [],
-              ),
-            );
+            const applied = applyLeagueDraft(draft);
+            setStatusByName(applied.statusByName);
+            setMyTeamOrder(applied.myTeamOrder);
+            setTakenOrder(applied.takenOrder);
           }
         } catch {
           if (!cancelled) {
@@ -123,6 +133,7 @@ export function useSyncedCastState() {
         const status = readDraftStatusMap();
         setStatusByName(status);
         setMyTeamOrder(reconcileMyTeamOrder(status, readMyTeamOrder()));
+        setTakenOrder(reconcileTakenOrder(status, readTakenOrder()));
       }
 
       if (!cancelled) setReady(true);
@@ -146,7 +157,8 @@ export function useSyncedCastState() {
       MY_TEAM_ORDER_STORAGE_KEY,
       JSON.stringify(myTeamOrder),
     );
-  }, [statusByName, myTeamOrder, ready, leagueSlug]);
+    localStorage.setItem(TAKEN_ORDER_STORAGE_KEY, JSON.stringify(takenOrder));
+  }, [statusByName, myTeamOrder, takenOrder, ready, leagueSlug]);
 
   useEffect(() => {
     if (!ready) return;
@@ -158,7 +170,11 @@ export function useSyncedCastState() {
 
     draftDirtyRef.current = true;
     const timer = window.setTimeout(() => {
-      void saveLeagueDraft(leagueSlug, { statusByName, myTeamOrder })
+      void saveLeagueDraft(leagueSlug, {
+        statusByName,
+        myTeamOrder,
+        takenOrder,
+      })
         .then(() => {
           draftDirtyRef.current = false;
         })
@@ -168,7 +184,7 @@ export function useSyncedCastState() {
     }, DRAFT_SAVE_MS);
 
     return () => window.clearTimeout(timer);
-  }, [statusByName, myTeamOrder, leagueSlug, ready]);
+  }, [statusByName, myTeamOrder, takenOrder, leagueSlug, ready]);
 
   useEffect(() => {
     if (!ready) return;
@@ -199,13 +215,10 @@ export function useSyncedCastState() {
       void fetchLeagueDraft(leagueSlug)
         .then((draft) => {
           skipNextDraftSaveRef.current = true;
-          setStatusByName(draft.statusByName ?? {});
-          setMyTeamOrder(
-            reconcileMyTeamOrder(
-              draft.statusByName ?? {},
-              draft.myTeamOrder ?? [],
-            ),
-          );
+          const applied = applyLeagueDraft(draft);
+          setStatusByName(applied.statusByName);
+          setMyTeamOrder(applied.myTeamOrder);
+          setTakenOrder(applied.takenOrder);
         })
         .catch(() => {
           /* ignore transient poll errors */
@@ -239,6 +252,7 @@ export function useSyncedCastState() {
     if (typeof window !== "undefined") {
       localStorage.removeItem(DRAFT_STATUS_STORAGE_KEY);
       localStorage.removeItem(MY_TEAM_ORDER_STORAGE_KEY);
+      localStorage.removeItem(TAKEN_ORDER_STORAGE_KEY);
       localStorage.removeItem(TRIBE_ASSIGNMENT_STORAGE_KEY);
     }
 
@@ -246,6 +260,7 @@ export function useSyncedCastState() {
     skipNextTribeSaveRef.current = true;
     setStatusByName({});
     setMyTeamOrder([]);
+    setTakenOrder([]);
     setTribeByName({});
 
     const tasks: Promise<void>[] = [
@@ -256,11 +271,13 @@ export function useSyncedCastState() {
 
     if (leagueSlug) {
       tasks.push(
-        saveLeagueDraft(leagueSlug, { statusByName: {}, myTeamOrder: [] }).catch(
-          () => {
-            setSyncError("Could not reset league draft on server.");
-          },
-        ),
+        saveLeagueDraft(leagueSlug, {
+          statusByName: {},
+          myTeamOrder: [],
+          takenOrder: [],
+        }).catch(() => {
+          setSyncError("Could not reset league draft on server.");
+        }),
       );
     }
 
@@ -279,6 +296,14 @@ export function useSyncedCastState() {
 
     setMyTeamOrder((prev) => {
       if (status === "my-team") {
+        if (prev.includes(name)) return prev;
+        return [...prev, name];
+      }
+      return prev.filter((n) => n !== name);
+    });
+
+    setTakenOrder((prev) => {
+      if (status === "taken") {
         if (prev.includes(name)) return prev;
         return [...prev, name];
       }
@@ -307,6 +332,7 @@ export function useSyncedCastState() {
     statusByName,
     tribeByName,
     myTeamOrder,
+    takenOrder,
     setPlayerStatus,
     setPlayerTribe,
     resetAll,

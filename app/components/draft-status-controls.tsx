@@ -1,6 +1,7 @@
 "use client";
 
 import type { DraftStatus } from "@/app/lib/draft-status";
+import { DRAFT_PICK_COLORS } from "@/app/lib/draft-colors";
 
 const SOLO_LABELS: Record<Exclude<DraftStatus, "available">, string> = {
   "my-team": "My Team",
@@ -23,23 +24,6 @@ export function draftPickLabel(
   return draftOptionLabels(leagueView)[status];
 }
 
-function buttonClass(
-  active: boolean,
-  value: Exclude<DraftStatus, "available">,
-): string {
-  const base =
-    "flex w-1/2 min-w-0 items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400";
-
-  if (!active) {
-    return `${base} bg-zinc-100 text-zinc-700 hover:bg-zinc-200`;
-  }
-
-  if (value === "my-team") {
-    return `${base} bg-emerald-600 text-white hover:bg-emerald-700`;
-  }
-  return `${base} bg-zinc-700 text-white hover:bg-zinc-800`;
-}
-
 type DraftStatusControlsProps = {
   value: DraftStatus;
   onChange: (status: DraftStatus) => void;
@@ -54,9 +38,21 @@ export function DraftStatusControls({
   leagueView = false,
 }: DraftStatusControlsProps) {
   const labels = draftOptionLabels(leagueView);
-  const options = (
+  const allOptions = (
     Object.keys(labels) as Exclude<DraftStatus, "available">[]
-  ).map((valueKey) => ({ value: valueKey, label: labels[valueKey] }));
+  ).map((valueKey) => ({
+    value: valueKey,
+    label: labels[valueKey],
+    color: DRAFT_PICK_COLORS[valueKey],
+  }));
+
+  const visibleOptions =
+    value === "available"
+      ? allOptions
+      : allOptions.filter((opt) => opt.value === value);
+
+  const widthClass =
+    visibleOptions.length === 1 ? "w-full" : "w-1/2";
 
   return (
     <div
@@ -64,7 +60,7 @@ export function DraftStatusControls({
       role="group"
       aria-label="Draft status"
     >
-      {options.map((opt) => {
+      {visibleOptions.map((opt) => {
         const active = value === opt.value;
         return (
           <button
@@ -72,7 +68,12 @@ export function DraftStatusControls({
             type="button"
             aria-pressed={active}
             title={active ? `${opt.label} — click to clear` : opt.label}
-            className={buttonClass(active, opt.value)}
+            style={{ backgroundColor: opt.color }}
+            className={`flex ${widthClass} min-w-0 items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-semibold text-zinc-900 transition-[box-shadow,opacity] focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 ${
+              active
+                ? "ring-2 ring-inset ring-zinc-800/70"
+                : "ring-1 ring-inset ring-zinc-900/10 hover:opacity-90"
+            }`}
             onClick={(e) => {
               if (stopCardClick) e.stopPropagation();
               onChange(active ? "available" : opt.value);
@@ -80,7 +81,7 @@ export function DraftStatusControls({
           >
             <span>{opt.label}</span>
             {active ? (
-              <span className="text-base leading-none opacity-90" aria-hidden>
+              <span className="text-base leading-none opacity-80" aria-hidden>
                 ×
               </span>
             ) : null}
