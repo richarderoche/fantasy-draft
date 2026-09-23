@@ -1,0 +1,14 @@
+{
+  "tribes": [
+    {
+      "id": "savu",
+      "name": "Savu",
+      "color": "#E9D4FF"
+    },
+    {
+      "id": "toka",
+      "name": "Toka",
+      "color": "#FFF3A3"
+    }
+  ]
+}

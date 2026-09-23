@@ -1,0 +1,214 @@
+{
+  "cast": [
+    {
+      "name": "Aaliyah Puglia",
+      "age": 24,
+      "place": "Gloucester City, N.J. / Providence, R.I.",
+      "occupation": "Chef",
+      "words": "confident, wise, sporadic",
+      "bio": "She moved from a small New Jersey town to Miami at 13 with little warning, then to Rhode Island for college without knowing anyone, and has solo traveled for work in unfamiliar places. She identifies with Yam Yam’s humor and volume but says she can stay calculated, and hopes to play like Cirie with calm outreach, multiple angles, and loyalty to allies. Survivor, to her, is a chaotic strategy test of who can do the most with what they are given—and she wants the win.",
+      "headshot": "aaliyah-puglia.png",
+      "photo": "aaliyah-puglia.webp"
+    },
+    {
+      "name": "Alexis Levine",
+      "age": 34,
+      "place": "Atlanta, Ga.",
+      "occupation": "Criminal Defense Attorney",
+      "words": "outgoing, thoughtful, determined",
+      "bio": "She defends clients against the government and says that constant underdog role taught her creative thinking. She is 10 years sober from drugs and alcohol, is Iranian on her father’s side, and cites her daughter Lyla as daily motivation. She identifies most with Kyle Fraser and says she would play like him with touches of Rachel and Parvati, and wants alliance partners who think differently from her.",
+      "headshot": "alexis-levine.png",
+      "photo": "alexis-levine.webp"
+    },
+    {
+      "name": "An “Thien An” Nguyen",
+      "age": 24,
+      "place": "Fort Worth, Tex.",
+      "occupation": "Medical Student",
+      "words": "quick-witted, empathetic, outgoing",
+      "bio": "Boy Scouts gave her early outdoors and survival exposure, and she wants a Kenzie-style social game played close to the heart but still strategic. At five feet tall, she plans to lurk “incognito-ly” until it is time to strike, and she wants an ally who will not backstab her first. She is a back-to-back all-around intramural champ and says a friend told her during Covid that she “taught me what being happy truly means.”",
+      "headshot": "an-thien-an-nguyen.png",
+      "photo": "an-thien-an-nguyen.webp"
+    },
+    {
+      "name": "Ana Sani",
+      "age": 34,
+      "place": "Richmond Hill, Ontario, Canada / Toronto, Ontario, Canada",
+      "occupation": "Voice Actress",
+      "words": "goofy, ambitious, chaotic",
+      "bio": "She has voiced more than 60 animated shows plus commercials, audiobooks, and video games, and holds an honors degree in political science focused on power and political theory. She identifies with Tony’s chaos and would love to play like Ricard, and says allies who share others’ secrets with her have put trust in her that might be a mistake. She is playing for her mother, who fought cancer for 18 years, stayed optimistic, passed in 2020, and was a huge Survivor fan.",
+      "headshot": "ana-sani.png",
+      "photo": "ana-sani.webp"
+    },
+    {
+      "name": "Angelica “Jelly” Loblack",
+      "age": 29,
+      "place": "Garland, Tex. and Midwest City, Okla. / Bloomington, Ind.",
+      "occupation": "Sociology Professor",
+      "words": "curious, multifaceted, passionate",
+      "bio": "Survivor has been in her family for as long as she can remember and led her into sociology, ethnography, and critical analysis; she earned her PhD before 30. She identifies with Katurah Topps and thinks she will play most like Shan from season 41, and wants transparent, loyal allies who will brainstorm and take creative risks with her. She once won “most comedic mascot” at mascot camp as Webber the Bear, and cites her grandmother—a two-time breast cancer survivor—as her biggest inspiration.",
+      "headshot": "angelica-jelly-loblack.png",
+      "photo": "angelica-jelly-loblack.webp"
+    },
+    {
+      "name": "Brady Booker",
+      "age": 27,
+      "place": "La Salle, Ill. / Knoxville, Tenn.",
+      "occupation": "Pro Wrestler",
+      "words": "enthusiastic, intense, fun",
+      "bio": "His family watched Survivor together growing up, and his wrestling job involves long days, minimal sleep and food, and managing his own social game backstage. He identifies most with Jonathan for size, ability, and loyal vibe, and wants to be a laid-back provider until it is time to strike. He hunts, fishes, hikes, camps, lifts, and does jiu-jitsu, did gymnastics in youth sports, and says trust is what he values most in an alliance.",
+      "headshot": "brady-booker.png",
+      "photo": "brady-booker.webp"
+    },
+    {
+      "name": "Carter Krull",
+      "age": 24,
+      "place": "Rock Rapids, Iowa / Sioux Falls, S.D.",
+      "occupation": "Livestock Farmer",
+      "words": "adventurous, competitive, determined",
+      "bio": "He opened a snow cone truck, builds epoxy river tables after learning from his grandpa and high school shop teacher, and co-founded a moving company called MOVE MOVE MOVE that now handles relocations across the U.S. He loves Tony’s thrill and says his style could land anywhere between Rob, Ozzy, Tony, and Sam Phalen depending on the situation. He wants alliance partners who communicate and keep each other in the loop because trust is “the bottom layer of flooring” in the game.",
+      "headshot": "carter-krull.png",
+      "photo": "carter-krull.webp"
+    },
+    {
+      "name": "Cristian Chavez",
+      "age": 26,
+      "place": "Salt Lake City, Utah",
+      "occupation": "Head of HR",
+      "words": "fun, chaotic, loud",
+      "bio": "His dad built mini Survivor-style challenges for him growing up, and he earned his master’s degree at 21. He identifies most with Tai and wants to mix Tai, Cirie, Tony, and Carolyn in his approach; he is a dad with a very loud laugh and a strong aversion to worms. He says he is willing to do anything to win, and if he is not winning, he will do whatever it takes to make everyone else lose.",
+      "headshot": "cristian-chavez.png",
+      "photo": "cristian-chavez.webp"
+    },
+    {
+      "name": "Danny “Kilby” Kilby",
+      "age": 30,
+      "place": "Mount Forest, Ontario, Canada / London, Ontario, Canada",
+      "occupation": "Game Designer",
+      "words": "wacky, chaotic, playful",
+      "bio": "Survivor has been his favorite show since childhood; he met his girlfriend playing a fan-made Survivor game—she lives in Florida—and most of his close friends came through fandom. He was first in his family to finish high school and university with straight A’s; his mom later graduated too after raising him as a teen mom. He identifies with Todd Herzog or Ben Katzman, hopes to play like David Wright with bold moves built on deep bonds, and says he looks for a partner’s “real laugh” before locking in an alliance.",
+      "headshot": "danny-kilby.png",
+      "photo": "danny-kilby.webp"
+    },
+    {
+      "name": "Devin Way",
+      "age": 33,
+      "place": "Lufkin, Tex. / Los Angeles, Calif.",
+      "occupation": "Actor",
+      "words": "charming, playful, loyal",
+      "bio": "He plays Dungeons & Dragons every week and says that game taught him to roll with whatever happens alongside his team. He wants to play like Rick Devens for joy and love of the game, identifies with Joe for integrity and grief after losing a sibling, and has 12 brothers and sisters—he is number seven. Loyalty and honesty keep him in an alliance; he says finding out a partner lied or betrayed him means he will look for a new one.",
+      "headshot": "devin-way.png",
+      "photo": "devin-way.webp"
+    },
+    {
+      "name": "Eric Macksoud",
+      "age": 34,
+      "place": "Lincoln, R.I. / Windsor Locks, Conn.",
+      "occupation": "Mental Health Counselor",
+      "words": "animated, charismatic, empathic",
+      "bio": "Community theater throws him into new mixed-age casts where bonds form fast, which he compares to starting on a new Survivor tribe. He saw himself in Dominick Abbate on Ghost Island—East Coast Italian American charm, strong ride-or-die bonds, upfront feelings, and calculated risks. He passed his LMHC licensing exam on his fourth attempt, is trained in Muay Thai kickboxing, and was a competitive swimmer from age 8 through college; he is engaged to Gina DeVito.",
+      "headshot": "eric-macksoud.png",
+      "photo": "eric-macksoud.webp"
+    },
+    {
+      "name": "Jenna Doore",
+      "age": 30,
+      "place": "Perrysburg, Ohio / Toledo, Ohio",
+      "occupation": "Wedding Photographer",
+      "words": "empathetic, determined, energetic",
+      "bio": "She has watched since age seven and once negotiated staying up for a finale by inventing her own one-minute handstand immunity challenge. Wedding days taught her adaptability under high stakes, and for five years her contracts included a “Survivor Clause” because she believed playing was her destiny. She hopes to blend Kenzie’s social warmth with Charlie’s habit of keeping options open while others underestimate him, and before casting she gave away 154 poems in exchange for strangers sharing their dreams.",
+      "headshot": "jenna-doore.png",
+      "photo": "jenna-doore.webp"
+    },
+    {
+      "name": "Kristin Flickinger",
+      "age": 49,
+      "place": "Ketchum, Idaho / Santa Barbara, Calif.",
+      "occupation": "Crisis Management",
+      "words": "determined, joyful, propulsive",
+      "bio": "She has applied for Survivor since the middle of season one and works in LGBTQ+ crisis management after growing up in the Idaho mountains. She identifies with Rachel LaMont’s quirky, likable, innovative style and wants an alliance partner who can think fast through complex situations and “get up to mischief together.” She created an intergenerational culinary arts program for LGBTQ+ youth and seniors that she says has touched thousands of lives, and hobbies include road cycling and training her husky to talk with buttons.",
+      "headshot": "kristin-flickinger.png",
+      "photo": "kristin-flickinger.webp"
+    },
+    {
+      "name": "Lewis Kelly",
+      "age": 28,
+      "place": "Dublin, Ireland / Puerto Rico, USA",
+      "occupation": "Farmer",
+      "words": "cheeky, devilish, charming",
+      "bio": "After becoming a U.S. citizen he applied to live his American dream, and he compares a recent North Korea trip—isolation, hard beds, no phones, not knowing what comes next—to Survivor. He and his wife Andrea travel in a renovated school bus they call home, he has visited more than 40 countries, and he identifies with Venus and says he feels like “a better, cooler version of Tyson.” He loves that lying is acceptable on the show, wants chaos partners who will not rat him out, and says snitches get their torches snuffed.",
+      "headshot": "lewis-kelly.png",
+      "photo": "lewis-kelly.webp"
+    },
+    {
+      "name": "Linnea Capobianco",
+      "age": 25,
+      "place": "Kearny, N.J. / Jersey City, N.J.",
+      "occupation": "Entrepreneur",
+      "words": "rational, outgoing, optimistic",
+      "bio": "Studying and working in Washington, D.C. taught her to network with people in power and with opposing views, which she ties to Survivor’s social politics. She is a successful business owner in New York City, identifies with Kyle Fraser for relationship-building and leading votes without being the obvious leader, and wants rational alliance partners who do not spiral into paranoia. She says she has had uncontrollable laughing attacks at funerals, church, class, and during presentations.",
+      "headshot": "linnea-capobianco.png",
+      "photo": "linnea-capobianco.webp"
+    },
+    {
+      "name": "Maggie Nestor",
+      "age": 40,
+      "place": "Middleway, W.Va. / Charles Town, W.Va.",
+      "occupation": "Farmer",
+      "words": "joyful, intentional, redneck",
+      "bio": "She has watched Survivor for 25 years since she was 15 and says growing up in West Virginia prepared her for the game. She most identifies with Parvati, is a mom of three, and lists farming, gardening, fishing, hunting, running, lifting, pole vaulting, reading, teaching, singing, cooking, and guitar among her hobbies. The life she and her husband built is her proudest accomplishment, and she wants alliance partners who are creative, open, happy, and willing to make bold moves.",
+      "headshot": "maggie-nestor.png",
+      "photo": "maggie-nestor.webp"
+    },
+    {
+      "name": "Mike Pinsky",
+      "age": 32,
+      "place": "New York City",
+      "occupation": "Baseball Executive",
+      "words": "enthusiastic, strategic, driven",
+      "bio": "At eight he played Survivor with friends in New York City apartments; at 28 his marriage proposal to his wife Becky used a Jeff Probst catchphrase, and they met acting in school plays with their first kiss on stage in A Midsummer Night’s Dream. He works for the Yankees scouting and assessing players from desks and seats but says he burns to be the one playing; he lost his mom to metastatic breast cancer at 24 and remembers her saying “everyone has something to offer.” He compares his toolkit to Kyle Fraser, Charlie Davis, and Adam Klein and hopes to innovate like Rachel LaMont, and he wants allies who help gather intel on who is working with whom and who holds advantages.",
+      "headshot": "mike-pinsky.png",
+      "photo": "mike-pinsky.webp"
+    },
+    {
+      "name": "Ori-Jean Charles",
+      "age": 27,
+      "place": "Spring Valley, N.Y.",
+      "occupation": "Personal Trainer",
+      "words": "consistent, anomaly, hustler",
+      "bio": "When his mom hurt her back in college he transferred from Louisville to Maine to be closer home, drove eight hours most weekends in a small Audi until the car “literally blew up,” and still broke an NCAA Division I record and won awards. He is the first in his family to earn a college degree and later a master’s, and says everyone in his family is now a college graduate—including a sister becoming a doctor. He identifies with Jeremy for playing strategically for family, wants loyal allies who will pull the trigger on moves with him, and says winning would let him retire his mom after her sacrifices.",
+      "headshot": "ori-jean-charles.png",
+      "photo": "ori-jean-charles.webp"
+    },
+    {
+      "name": "Patt Cannaday",
+      "age": 33,
+      "place": "Tampa, Fla. / Washington, D.C.",
+      "occupation": "Federal Prosecutor",
+      "words": "goofy, loyal, intense",
+      "bio": "In Brazil a planned three-hour hike became six without fluent Portuguese, ended in a climb, and they found their way back in the dark through friendship—she says she is used to adventures she is unprepared for. She loves Amanda Kimmel’s loyal, resilient game and Rachel LaMont’s scrappy climb, and wants partners willing to take risks and join in shenanigans. Her hobbies include boxing, skydiving, hiking, and dramatic reading nights; her marriage is her proudest accomplishment, and her mom homeschooled her and her siblings while her dad was a 26-year Air Force officer.",
+      "headshot": "patt-cannaday.png",
+      "photo": "patt-cannaday.webp"
+    },
+    {
+      "name": "Rob Antonson",
+      "age": 40,
+      "place": "Johnston, R.I. / Cumberland, R.I.",
+      "occupation": "Airline Gate Agent",
+      "words": "competitive, funny, loving",
+      "bio": "He calls himself a total city boy who has never been outdoorsy and wants his three young kids to see him take chances outside his comfort zone. Working the airport means daily conversations with travelers from around the world and constant chaos; he says Survivor chaos feels like just another busy Friday at the airport. He identifies with Boston Rob as a New England Sox fan with swagger, plans Joe-like loyalty mixed with Tony-like manipulation, coaches his sons in baseball, football, and soccer, and watches Real Housewives, Traitors, Love Island, and The Challenge.",
+      "headshot": "rob-antonson.png",
+      "photo": "rob-antonson.webp"
+    },
+    {
+      "name": "Sharonda Cox",
+      "age": 34,
+      "place": "Pompano Beach, Fla. / Richmond, Ky.",
+      "occupation": "Resident, OBGYN",
+      "words": "charismatic, resilient, reliable",
+      "bio": "Growing up in Pompano Beach in a single-parent household taught her to work hard for what she wants and stay appreciative through ups and downs. She identifies with Cirie as a strong Black woman often surprised by her own accomplishments, was first chair in orchestra, played violin at Disney, and loved NASA as a science kid. She wants alliance partners with loyalty and adaptability for last-minute tribal changes, enjoys fishing, reading, and watching sports with her husband, and cites her maternal grandparents—who left school to work bean fields—as her biggest inspiration.",
+      "headshot": "sharonda-cox.png",
+      "photo": "sharonda-cox.webp"
+    }
+  ]
+}

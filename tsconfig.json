@@ -24,6 +24,8 @@
   },
   "include": [
     "next-env.d.ts",
+    "survivor-51-cast.json",
+    "tribes.json",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
