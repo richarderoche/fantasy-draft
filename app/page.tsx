@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import castData from "@/survivor-51-cast.json";
 import { CastGrid, type Player } from "./components/cast-grid";
 
@@ -12,7 +13,15 @@ export default function Home() {
         </h1>
       </header>
 
-      <CastGrid cast={cast} />
+      <Suspense
+        fallback={
+          <p className="px-4 py-12 text-center text-sm text-zinc-500">
+            Loading…
+          </p>
+        }
+      >
+        <CastGrid cast={cast} />
+      </Suspense>
     </div>
   );
 }

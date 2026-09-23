@@ -2,27 +2,23 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { DraftStatusControls } from "./draft-status-controls";
+import {
+  DraftStatusControls,
+  draftPickLabel,
+} from "./draft-status-controls";
 import { TribeControls } from "./tribe-controls";
+import { useSyncedCastState } from "@/app/hooks/use-synced-cast-state";
 import {
   type DraftStatus,
   type DraftStatusFilter,
-  DRAFT_STATUS_STORAGE_KEY,
-  MY_TEAM_ORDER_STORAGE_KEY,
-  readDraftStatusMap,
-  readMyTeamOrder,
-  reconcileMyTeamOrder,
   resolveDraftStatus,
   sortCastByMyTeamPickOrder,
 } from "@/app/lib/draft-status";
 import {
-  readTribeAssignmentMap,
   resolvePlayerTribe,
-  TRIBE_ASSIGNMENT_STORAGE_KEY,
   type TribeFilter,
   type TribeId,
 } from "@/app/lib/tribe-assignment";
-import { clearPersistedCastData } from "@/app/lib/local-persist";
 import { getTribeById, TRIBES, type Tribe } from "@/app/lib/tribes";
 
 export type Player = {
@@ -161,8 +157,9 @@ function ResetConfirmDialog({
           Reset saved data?
         </h2>
         <p id="reset-dialog-desc" className="mt-2 text-sm text-zinc-600">
-          This clears all draft picks (My Team, Taken) and tribe assignments
-          stored in this browser. It cannot be undone.
+          This clears draft picks and tribe assignments everywhere they are
+          stored (this browser, shared tribes, and the current league if you
+          are using one). It cannot be undone.
         </p>
         <div className="mt-5 flex justify-end gap-2">
           <button
@@ -197,6 +194,8 @@ function CastFiltersBar({
   cardControlMode,
   onCardControlMode,
   onRequestReset,
+  leagueSlug,
+  syncError,
 }: {
   statusFilter: DraftStatusFilter;
   onStatusFilterChange: (value: DraftStatusFilter) => void;
@@ -209,10 +208,23 @@ function CastFiltersBar({
   cardControlMode: CardControlMode;
   onCardControlMode: (mode: CardControlMode) => void;
   onRequestReset: () => void;
+  leagueSlug: string | null;
+  syncError: string | null;
 }) {
   return (
     <div className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3">
+        {syncError ? (
+          <p className="text-sm text-amber-800" role="status">
+            {syncError}
+          </p>
+        ) : null}
+        {leagueSlug ? (
+          <p className="text-sm text-zinc-600">
+            Shared league:{" "}
+            <span className="font-medium text-zinc-900">{leagueSlug}</span>
+          </p>
+        ) : null}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <span className="font-medium text-zinc-700">Mode:</span>
@@ -259,8 +271,12 @@ function CastFiltersBar({
               className="min-w-[10rem] rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 shadow-sm"
             >
               <option value="available">Available</option>
-              <option value="my-team">My Team</option>
-              <option value="taken">Taken</option>
+              <option value="my-team">
+                {draftPickLabel("my-team", Boolean(leagueSlug))}
+              </option>
+              <option value="taken">
+                {draftPickLabel("taken", Boolean(leagueSlug))}
+              </option>
               <option value="all">All</option>
             </select>
           </label>
@@ -300,6 +316,7 @@ function Lightbox({
   playerTribeId,
   onTribeChange,
   tribes,
+  leagueView,
   onClose,
 }: {
   player: Player;
@@ -309,6 +326,7 @@ function Lightbox({
   playerTribeId: TribeId | null;
   onTribeChange: (tribeId: TribeId | null) => void;
   tribes: Tribe[];
+  leagueView: boolean;
   onClose: () => void;
 }) {
   useEffect(() => {
@@ -372,6 +390,7 @@ function Lightbox({
                     <DraftStatusControls
                       value={draftStatus}
                       onChange={onDraftStatusChange}
+                      leagueView={leagueView}
                     />
                   ) : (
                     <TribeControls
@@ -401,78 +420,25 @@ function Lightbox({
 }
 
 export function CastGrid({ cast }: { cast: Player[] }) {
+  const {
+    leagueSlug,
+    ready,
+    syncError,
+    statusByName,
+    tribeByName,
+    myTeamOrder,
+    setPlayerStatus,
+    setPlayerTribe,
+    resetAll,
+  } = useSyncedCastState();
+
   const [selected, setSelected] = useState<Player | null>(null);
-  const [statusByName, setStatusByName] = useState<
-    Record<string, DraftStatus>
-  >({});
-  const [tribeByName, setTribeByName] = useState<
-    Partial<Record<string, TribeId>>
-  >({});
-  const [myTeamOrder, setMyTeamOrder] = useState<string[]>([]);
-  const [storageReady, setStorageReady] = useState(false);
   const [statusFilter, setStatusFilter] =
     useState<DraftStatusFilter>("available");
   const [tribeFilter, setTribeFilter] = useState<TribeFilter>("all");
   const [cardControlMode, setCardControlMode] =
     useState<CardControlMode>("draft");
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
-
-  useEffect(() => {
-    const status = readDraftStatusMap();
-    setStatusByName(status);
-    setMyTeamOrder(reconcileMyTeamOrder(status, readMyTeamOrder()));
-    setTribeByName(readTribeAssignmentMap());
-    setStorageReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!storageReady) return;
-    localStorage.setItem(
-      DRAFT_STATUS_STORAGE_KEY,
-      JSON.stringify(statusByName),
-    );
-    localStorage.setItem(
-      MY_TEAM_ORDER_STORAGE_KEY,
-      JSON.stringify(myTeamOrder),
-    );
-    localStorage.setItem(
-      TRIBE_ASSIGNMENT_STORAGE_KEY,
-      JSON.stringify(tribeByName),
-    );
-  }, [statusByName, myTeamOrder, tribeByName, storageReady]);
-
-  const setPlayerStatus = useCallback((name: string, status: DraftStatus) => {
-    setStatusByName((prev) => {
-      if (status === "available") {
-        const next = { ...prev };
-        delete next[name];
-        return next;
-      }
-      return { ...prev, [name]: status };
-    });
-
-    setMyTeamOrder((prev) => {
-      if (status === "my-team") {
-        if (prev.includes(name)) return prev;
-        return [...prev, name];
-      }
-      return prev.filter((n) => n !== name);
-    });
-  }, []);
-
-  const setPlayerTribe = useCallback(
-    (name: string, tribeId: TribeId | null) => {
-      setTribeByName((prev) => {
-        if (tribeId === null) {
-          const next = { ...prev };
-          delete next[name];
-          return next;
-        }
-        return { ...prev, [name]: tribeId };
-      });
-    },
-    [],
-  );
 
   const getPlayerStatus = useCallback(
     (name: string) => resolveDraftStatus(statusByName, name),
@@ -529,12 +495,16 @@ export function CastGrid({ cast }: { cast: Player[] }) {
   const close = useCallback(() => setSelected(null), []);
 
   const confirmReset = useCallback(() => {
-    clearPersistedCastData();
-    setStatusByName({});
-    setTribeByName({});
-    setMyTeamOrder([]);
-    setResetDialogOpen(false);
-  }, []);
+    void resetAll().finally(() => setResetDialogOpen(false));
+  }, [resetAll]);
+
+  if (!ready) {
+    return (
+      <p className="px-4 py-12 text-center text-sm text-zinc-500">
+        Loading…
+      </p>
+    );
+  }
 
   return (
     <>
@@ -550,6 +520,8 @@ export function CastGrid({ cast }: { cast: Player[] }) {
         cardControlMode={cardControlMode}
         onCardControlMode={setCardControlMode}
         onRequestReset={() => setResetDialogOpen(true)}
+        leagueSlug={leagueSlug}
+        syncError={syncError}
       />
       {resetDialogOpen ? (
         <ResetConfirmDialog
@@ -626,6 +598,7 @@ export function CastGrid({ cast }: { cast: Player[] }) {
                   <DraftStatusControls
                     value={status}
                     onChange={(next) => setPlayerStatus(player.name, next)}
+                    leagueView={Boolean(leagueSlug)}
                     stopCardClick
                   />
                 ) : (
@@ -652,6 +625,7 @@ export function CastGrid({ cast }: { cast: Player[] }) {
           playerTribeId={getPlayerTribe(selected.name)}
           onTribeChange={(next) => setPlayerTribe(selected.name, next)}
           tribes={TRIBES}
+          leagueView={Boolean(leagueSlug)}
           onClose={close}
         />
       ) : null}
